@@ -140,11 +140,11 @@ tcp_frame_t* parse_tcp_frame(FILE* fd, unsigned int ipv4_payload_length) {
 
   unsigned char seq_num_bytes[4];
   fread(&seq_num_bytes, sizeof(unsigned char), 4, fd);
-  header->seq_number = (seq_num_bytes[0] << 24) + (seq_num_bytes[2] << 16) + (seq_num_bytes[2] << 8) + seq_num_bytes[3];
+  header->seq_number = (seq_num_bytes[0] << 24) + (seq_num_bytes[1] << 16) + (seq_num_bytes[2] << 8) + seq_num_bytes[3];
 
   unsigned char ack_num_bytes[4];
   fread(&ack_num_bytes, sizeof(unsigned char), 4, fd);
-  header->ack_number = (ack_num_bytes[0] << 24) + (ack_num_bytes[2] << 16) + (ack_num_bytes[2] << 8) + ack_num_bytes[3];
+  header->ack_number = (ack_num_bytes[0] << 24) + (ack_num_bytes[1] << 16) + (ack_num_bytes[2] << 8) + ack_num_bytes[3];
 
   fread(&header->flags, sizeof(unsigned char), 2, fd);
   header->header_length = (header->flags[0] >> 4) * 4;
