@@ -28,6 +28,8 @@ void _socket_newline(int fd, int skip) {
       continue;
     printf("%c", resp);
   }
+  if (skip)
+    return;
   printf("\n");
 }
 
