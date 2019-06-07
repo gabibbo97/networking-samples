@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
   // DNS query
   if (getaddrinfo(argv[1], argv[2], &hints, &result) == -1) {
     perror("Could not find address");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   int sock = -1;
@@ -140,6 +140,7 @@ int main(int argc, char *argv[]) {
       exit(EXIT_FAILURE);
     } else {
       skip_until_newline(sock);
+      printf("Authentication successful\n");
       break;
     }
   }

@@ -75,8 +75,7 @@ int check_authenticated(int authenticated, int fd) {
   if (authenticated)
     return 1;
   // Else send an error
-  const char msg[] = "ERR Auth required\n";
-  send(fd, &msg, sizeof(msg), 0);
+  dprintf(fd, "ERR Auth required\n");
   return 0;
 }
 
@@ -160,8 +159,7 @@ void command_download(int fd, user_data_t *command) {
 
   // Check if filename has been provided
   if (filename == NULL) {
-    const char msg[] = "ERR Filename not specified\n";
-    send(fd, &msg, sizeof(msg), 0);
+    dprintf(fd, "ERR Filename not specified\n");
     return;
   }
 
@@ -169,6 +167,7 @@ void command_download(int fd, user_data_t *command) {
   struct stat file_info;
 
   char *path = (char *)calloc(1 + 6 + strlen(filename), sizeof(char));
+  check_pointer(path);
   strcat(path, "files");
   strcat(path, "/");
   strcat(path, filename);
@@ -176,11 +175,9 @@ void command_download(int fd, user_data_t *command) {
   if (stat(path, &file_info) == -1) {
     perror("Failed to stat file");
     if (errno == ENOENT) {
-      const char err[] = "ERR File not found\n";
-      send(fd, err, sizeof(err), 0);
+      dprintf(fd, "ERR File not found\n");
     } else {
-      const char err[] = "ERR Server error\n";
-      send(fd, err, sizeof(err), 0);
+      dprintf(fd, "ERR Server error\n");
     }
     return;
   }
@@ -191,8 +188,7 @@ void command_download(int fd, user_data_t *command) {
 
   if (file_to_send == NULL) {
     perror("Could not open file");
-    const char err[] = "ERR Server error\n";
-    send(fd, err, sizeof(err), 0);
+    dprintf(fd, "ERR Server error\n");
     return;
   }
 
@@ -214,8 +210,7 @@ void command_upload(int fd, user_data_t *command) {
   char *filename = strtok(NULL, " ");
 
   if (filename == NULL) {
-    const char msg[] = "ERR Filename not specified\n";
-    send(fd, &msg, sizeof(msg), 0);
+    dprintf(fd,"ERR Filename not specified\n");
     return;
   }
 
@@ -223,16 +218,14 @@ void command_upload(int fd, user_data_t *command) {
   char *filesize_string = strtok(NULL, " ");
 
   if (filesize_string == NULL) {
-    const char msg[] = "ERR Size not provided\n";
-    send(fd, &msg, sizeof(msg), 0);
+    dprintf(fd, "ERR Size not provided\n");
     return;
   }
 
   unsigned int filesize = atoi(filesize_string);
 
   if (filesize < 1) {
-    const char msg[] = "ERR Size invalid\n";
-    send(fd, &msg, sizeof(msg), 0);
+    dprintf(fd, "ERR Size invalid\n");
     return;
   }
 
@@ -250,8 +243,7 @@ void command_upload(int fd, user_data_t *command) {
 
   if (file_to_receive == NULL) {
     perror("Could not open file");
-    const char err[] = "ERR Server error\n";
-    send(fd, err, sizeof(err), 0);
+    dprintf(fd, "ERR Server error\n");
     return;
   }
 
@@ -263,6 +255,7 @@ void command_upload(int fd, user_data_t *command) {
       max_buffer_size = filesize;
 
     char *buf = (char *)calloc(max_buffer_size, sizeof(char));
+    check_pointer(buf);
 
     read_size = recv(fd, buf, max_buffer_size, MSG_WAITALL);
     if (fwrite(buf, sizeof(char), read_size, file_to_receive) <
