@@ -166,19 +166,26 @@ int main(int argc, char *argv[]) {
     int direntries = atoi(file_size_buf);
 
     // Directory listing
-    char recvb;
-    int received_entries = 0;
-    for (;;) {
-      unsigned int recv_len = recv(sock, &recvb, 1, MSG_WAITALL);
-      printf("%c", recvb);
-      if (recvb == '\n') {
-        received_entries++;
-        if (received_entries == direntries)
+    if (direntries > 0) {
+
+      char recvb;
+      int received_entries = 0;
+      for (;;) {
+        unsigned int recv_len = recv(sock, &recvb, 1, MSG_WAITALL);
+        printf("%c", recvb);
+        if (recvb == '\n') {
+          received_entries++;
+          if (received_entries == direntries)
+            break;
+        }
+        if (recv_len < 1) {
           break;
+        }
       }
-      if (recv_len < 1) {
-        break;
-      }
+
+    } else {
+      // No file is present
+      printf("Directory empty\n");
     }
 
     command_ok = 1;
