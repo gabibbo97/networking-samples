@@ -11,6 +11,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define BUFFER_SIZE 4096
+
 // Data
 
 typedef struct user_data_s {
@@ -195,8 +197,8 @@ void command_download(int fd, user_data_t *command) {
   dprintf(fd, "FILE SIZE %ld\n", file_info.st_size);
 
   ssize_t read_size;
-  char buf[64];
-  while ((read_size = fread(&buf, sizeof(char), 64, file_to_send)) > 0) {
+  char buf[BUFFER_SIZE];
+  while ((read_size = fread(&buf, sizeof(char), BUFFER_SIZE, file_to_send)) > 0) {
     send(fd, &buf, read_size, 0);
   }
   fclose(file_to_send);
@@ -250,7 +252,7 @@ void command_upload(int fd, user_data_t *command) {
   ssize_t read_size;
 
   for (;;) {
-    unsigned int max_buffer_size = 512;
+    unsigned int max_buffer_size = BUFFER_SIZE;
     if (filesize < max_buffer_size)
       max_buffer_size = filesize;
 

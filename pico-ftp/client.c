@@ -12,6 +12,8 @@
 #include <libgen.h>
 #include <sys/stat.h>
 
+#define BUFFER_SIZE 4096
+
 void socketskip(int fd, int count) {
   char buf;
   for (int i = 0; i < count; i++)
@@ -214,8 +216,8 @@ int main(int argc, char *argv[]) {
     // Upload file
     dprintf(sock, "UPLOAD %s SIZE %ld\n", basename(argv[4]), file_info.st_size);
     while (!feof(file_to_upload)) {
-      char buf[128];
-      unsigned int read_bytes = fread(&buf, sizeof(char), 128, file_to_upload);
+      char buf[BUFFER_SIZE];
+      unsigned int read_bytes = fread(&buf, sizeof(char), BUFFER_SIZE, file_to_upload);
       send(sock, &buf, read_bytes, 0);
     }
     dprintf(sock, "\n");
@@ -263,7 +265,7 @@ int main(int argc, char *argv[]) {
       exit(EXIT_FAILURE);
     }
     while (file_size > 0) {
-      int buf_size = 128;
+      int buf_size = BUFFER_SIZE;
       if (buf_size > (int)file_size) {
         buf_size = file_size;
       }
